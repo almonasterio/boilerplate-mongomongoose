@@ -7,7 +7,8 @@
 /*  ================== */
 
 /** 1) Install & Set up mongoose */
-
+const mongoose = require('mongoose');
+mongoose.connect(process.env.MONGO_URI);
 // Add mongodb and mongoose to the project's package.json. Then require 
 // mongoose. Store your Mongo Atlas database URI in the private .env file 
 // as MONGO_URI. Connect to the database using the following syntax:
@@ -20,7 +21,11 @@
 /*  ====================== */
 
 /** 2) Create a 'Person' Model */
-
+var personSchema = new mongoose.Schema({
+  name: String,
+  age: Number,
+  favoriteFoods: [String]
+});
 // First of all we need a **Schema**. Each schema maps to a MongoDB collection
 // and defines the shape of the documents within that collection. Schemas are
 // building block for Models. They can be nested to create complex models,
@@ -41,7 +46,7 @@
 
 // <Your code here >
 
-var Person /* = <Your Model> */
+var Person = mongoose.model('Person', personSchema);
 
 // **Note**: Glitch is a real server, and in real servers interactions with
 // the db are placed in handler functions, to be called when some event happens
@@ -78,10 +83,17 @@ var Person /* = <Your Model> */
 //    ...do your stuff here...
 // });
 
-var createAndSavePerson = function(done) {
-  
-  done(null /*, data*/);
+var createAndSavePerson = function (done) {
+  var janeFonda = new Person({
+    name: "Jane Fonda",
+    age: 84,
+    favoriteFoods: ["vodka", "air"]
+  });
 
+  janeFonda.save(function (err, data) {
+    if (err) return console.error(err);
+    done(null, data)
+  });
 };
 
 /** 4) Create many People with `Model.create()` */
@@ -93,10 +105,28 @@ var createAndSavePerson = function(done) {
 // Create many people using `Model.create()`, using the function argument
 // 'arrayOfPeople'.
 
-var createManyPeople = function(arrayOfPeople, done) {
-    
-    done(null/*, data*/);
-    
+var arrayOfPeople = [{
+    name: "Frankie",
+    age: 74,
+    favoriteFoods: ["Del Taco"]
+  },
+  {
+    name: "Sol",
+    age: 76,
+    favoriteFoods: ["roast chicken"]
+  },
+  {
+    name: "Robert",
+    age: 78,
+    favoriteFoods: ["wine"]
+  }
+];
+
+var createManyPeople = function (arrayOfPeople, done) {
+  Person.create(arrayOfPeople, function (err, people) {
+    if (err) return console.log(err);
+    done(null, people);
+  });
 };
 
 /** # C[R]UD part II - READ #
